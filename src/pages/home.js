@@ -14,7 +14,7 @@ export default class HomePage {
     try {
       // Fetch site configuration and recent posts
       const [siteConfig, recentPosts] = await Promise.all([
-        this.storyblokApi.getSiteConfiguration(),
+        this.storyblokApi.getSiteConfig(),
         this.storyblokApi.getBlogPosts({ page: 1, perPage: 6 }),
       ]);
 
