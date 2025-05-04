@@ -8,6 +8,7 @@
     "build": "webpack --mode production",
     "start": "node server.js",
     "start:dev": "npm run dev",
+    "railway-start": "npm run build && npm start",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
     "lint": "eslint src/**/*.js",

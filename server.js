@@ -3,38 +3,24 @@ const path = require('path');
 const compression = require('compression');
 const helmet = require('helmet');
 const cors = require('cors');
-const fs = require('fs');
 require('dotenv').config();
 
 const app = express();
-// Railway provides PORT dynamically
+
+// Debug: Log all environment variables (safely)
+console.log('Environment variables received:');
+console.log('PORT:', process.env.PORT);
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log(
+  'All env var keys:',
+  Object.keys(process.env).filter((key) => !key.includes('TOKEN'))
+);
+
+// IMPORTANT: Use Railway's PORT or fallback
 const PORT = process.env.PORT || 3000;
 
-// Debug logging
-console.log('Starting server...');
-console.log('PORT:', PORT);
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('Current directory:', __dirname);
-console.log('Process directory:', process.cwd());
-
-// Check if dist folder exists
-const distPath = path.join(__dirname, 'dist');
-if (!fs.existsSync(distPath)) {
-  console.error('ERROR: dist folder does not exist!');
-  console.error('Please run "npm run build" first');
-  process.exit(1);
-}
-
-// Check if index.html exists
-const indexPath = path.join(distPath, 'index.html');
-if (!fs.existsSync(indexPath)) {
-  console.error('ERROR: dist/index.html does not exist!');
-  console.error('Build may have failed');
-  process.exit(1);
-}
-
-console.log('dist folder found:', distPath);
-console.log('Files in dist:', fs.readdirSync(distPath));
+// Debug: Confirm which port we're using
+console.log(`Attempting to start server on port: ${PORT}`);
 
 // Security middleware
 app.use(
@@ -92,51 +78,50 @@ app.use(
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'healthy', timestamp: new Date().toISOString() });
+  res.status(200).json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    port: PORT,
+    env: process.env.NODE_ENV,
+  });
 });
 
 // Handle client-side routing
 app.get('*', (req, res) => {
-  const indexFile = path.join(__dirname, 'dist', 'index.html');
-
-  if (fs.existsSync(indexFile)) {
-    res.sendFile(indexFile);
-  } else {
-    res.status(404).send('index.html not found');
-  }
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error('Server error:', err);
+  console.error(err.stack);
   res.status(500).send('Something broke!');
 });
 
-// IMPORTANT: Listen on 0.0.0.0 for Railway
-const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server is running on port ${PORT}`);
+// Start server - IMPORTANT: Listen on 0.0.0.0 for Railway
+const server = app.listen(PORT, '0.0.0.0', (err) => {
+  if (err) {
+    console.error('Failed to start server:', err);
+    process.exit(1);
+  }
+  console.log(`Server successfully started!`);
+  console.log(`Server is running on http://0.0.0.0:${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV}`);
-  console.log(`Server URL: http://0.0.0.0:${PORT}`);
+  console.log(`Process ID: ${process.pid}`);
 });
 
-// Handle server errors
-server.on('error', (error) => {
-  console.error('Server error:', error);
-});
-
-// Graceful shutdown
+// Handle shutdown gracefully
 process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully...');
+  console.log('SIGTERM signal received: closing HTTP server');
   server.close(() => {
-    console.log('Server closed');
+    console.log('HTTP server closed');
     process.exit(0);
   });
 });
 
 process.on('SIGINT', () => {
-  console.log('SIGINT received, shutting down gracefully...');
+  console.log('SIGINT signal received: closing HTTP server');
   server.close(() => {
-    console.log('Server closed');
+    console.log('HTTP server closed');
     process.exit(0);
   });
 });
