@@ -18,5 +18,11 @@ app.get('*', (req, res) => {
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`);
-  console.log(`Open http://localhost:${PORT} to view the application`);
+
+  // Show different message based on environment
+  if (process.env.NODE_ENV === 'production') {
+    console.log(`Application is ready to accept requests`);
+  } else {
+    console.log(`Open http://localhost:${PORT} to view the application`);
+  }
 });
