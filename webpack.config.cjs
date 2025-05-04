@@ -38,6 +38,19 @@ module.exports = (env, argv) => {
           exclude: /node_modules/,
           use: {
             loader: 'babel-loader',
+            options: {
+              configFile: './babel.config.cjs',
+            },
+          },
+        },
+        {
+          test: /\.cjs$/,
+          exclude: /node_modules/,
+          use: {
+            loader: 'babel-loader',
+            options: {
+              configFile: './babel.config.cjs',
+            },
           },
         },
         {
@@ -65,7 +78,8 @@ module.exports = (env, argv) => {
       new Dotenv({
         systemvars: true,
         safe: false,
-        defaults: true,
+        defaults: false,
+        allowEmptyValues: true,
       }),
       new HtmlWebpackPlugin({
         template: './public/index.html',
@@ -81,7 +95,7 @@ module.exports = (env, argv) => {
     ],
 
     resolve: {
-      extensions: ['.js'],
+      extensions: ['.js', '.cjs'],
       alias: {
         '@': path.resolve(__dirname, 'src'),
       },
