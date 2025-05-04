@@ -39,17 +39,7 @@ module.exports = (env, argv) => {
           use: {
             loader: 'babel-loader',
             options: {
-              configFile: './babel.config.cjs',
-            },
-          },
-        },
-        {
-          test: /\.cjs$/,
-          exclude: /node_modules/,
-          use: {
-            loader: 'babel-loader',
-            options: {
-              configFile: './babel.config.cjs',
+              configFile: path.resolve(__dirname, 'babel.config.cjs'),
             },
           },
         },
@@ -95,7 +85,7 @@ module.exports = (env, argv) => {
     ],
 
     resolve: {
-      extensions: ['.js', '.cjs'],
+      extensions: ['.js'],
       alias: {
         '@': path.resolve(__dirname, 'src'),
       },
