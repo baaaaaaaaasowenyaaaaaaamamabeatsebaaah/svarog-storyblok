@@ -2,20 +2,20 @@
   "name": "svarog-storyblok-site",
   "version": "1.0.0",
   "description": "Website built with Svarog component library and Storyblok CMS",
-  "main": "server.js",
+  "main": "server.mjs",
+  "type": "module",
   "scripts": {
     "dev": "webpack serve --mode development",
     "build": "webpack --mode production",
-    "start": "node server.js",
+    "start": "node server.mjs",
+    "start:prod": "node server.mjs",
     "start:dev": "npm run dev",
-    "railway-start": "npm run build && npm start",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
     "lint": "eslint src/**/*.js",
     "lint:fix": "eslint src/**/*.js --fix",
     "format": "prettier --write \"src/**/*.{js,css,html}\"",
-    "prepare": "husky install",
-    "deploy": "npm run build && npm start"
+    "prepare": "husky install"
   },
   "dependencies": {
     "@storyblok/js": "^3.0.0",
