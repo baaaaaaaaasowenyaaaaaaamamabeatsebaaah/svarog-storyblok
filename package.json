@@ -5,8 +5,8 @@
   "main": "server.mjs",
   "type": "module",
   "scripts": {
-    "dev": "webpack serve --mode development",
-    "build": "webpack --mode production",
+    "dev": "webpack serve --mode development --config webpack.config.cjs",
+    "build": "webpack --mode production --config webpack.config.cjs",
     "start": "node server.mjs",
     "start:prod": "node server.mjs",
     "start:dev": "npm run dev",
