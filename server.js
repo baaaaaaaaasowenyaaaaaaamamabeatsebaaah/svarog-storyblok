@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const path = require('path');
 const compression = require('compression');
@@ -7,74 +6,69 @@ const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
+// Railway provides PORT dynamically
 const PORT = process.env.PORT || 3000;
 
 // Security middleware
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://app.storyblok.com"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:", "http:", "*.storyblok.com"],
-      connectSrc: ["'self'", "https://api.storyblok.com", "https://app.storyblok.com", "wss://ws.storyblok.com"],
-      fontSrc: ["'self'", "data:"],
-      objectSrc: ["'none'"],
-      mediaSrc: ["'self'"],
-      frameSrc: ["https://app.storyblok.com"],
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'https://app.storyblok.com'],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", 'data:', 'https:', 'http:', '*.storyblok.com'],
+        connectSrc: [
+          "'self'",
+          'https://api.storyblok.com',
+          'https://app.storyblok.com',
+          'wss://ws.storyblok.com',
+        ],
+        fontSrc: ["'self'", 'data:'],
+        objectSrc: ["'none'"],
+        mediaSrc: ["'self'"],
+        frameSrc: ['https://app.storyblok.com'],
+      },
     },
-  },
-  crossOriginEmbedderPolicy: false,
-  crossOriginResourcePolicy: { policy: "cross-origin" },
-}));
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  })
+);
 
-// Enable CORS for Storyblok
-app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : '*',
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+// Enable CORS
+app.use(
+  cors({
+    origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : '*',
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
 
 // Compression middleware
 app.use(compression());
 
-// Serve static files from the dist directory
-app.use(express.static(path.join(__dirname, 'dist'), {
-  maxAge: '1y',
-  etag: true,
-  lastModified: true,
-  setHeaders: (res, path) => {
-    if (path.endsWith('.html')) {
-      res.setHeader('Cache-Control', 'no-cache');
-    } else if (path.match(/\.(js|css|jpg|jpeg|png|gif|svg|ico)$/)) {
-      res.setHeader('Cache-Control', 'public, max-age=31536000');
-    }
-  }
-}));
-
-// API proxy for Storyblok (optional, if you want to hide your token)
-app.get('/api/storyblok/*', async (req, res) => {
-  try {
-    const apiPath = req.params[0];
-    const response = await fetch(`https://api.storyblok.com/v2/${apiPath}`, {
-      headers: {
-        'Authorization': process.env.STORYBLOK_TOKEN
+// Serve static files
+app.use(
+  express.static(path.join(__dirname, 'dist'), {
+    maxAge: '1y',
+    etag: true,
+    lastModified: true,
+    setHeaders: (res, path) => {
+      if (path.endsWith('.html')) {
+        res.setHeader('Cache-Control', 'no-cache');
+      } else if (path.match(/\.(js|css|jpg|jpeg|png|gif|svg|ico)$/)) {
+        res.setHeader('Cache-Control', 'public, max-age=31536000');
       }
-    });
-    const data = await response.json();
-    res.json(data);
-  } catch (error) {
-    console.error('Storyblok API Error:', error);
-    res.status(500).json({ error: 'Failed to fetch from Storyblok' });
-  }
-});
+    },
+  })
+);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'healthy', timestamp: new Date().toISOString() });
 });
 
-// Handle client-side routing - serve index.html for all other routes
+// Handle client-side routing
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
@@ -85,7 +79,7 @@ app.use((err, req, res, next) => {
   res.status(500).send('Something broke!');
 });
 
-// Start server
+// IMPORTANT: Listen on 0.0.0.0 for Railway
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV}`);

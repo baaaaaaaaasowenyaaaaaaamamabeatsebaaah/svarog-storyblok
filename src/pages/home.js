@@ -2,7 +2,7 @@
 import svarogUI from 'svarog-ui';
 import StoryblokApi from '../cms/storyblok.js';
 
-const { Page, Header, Footer, Hero, BlogList } = svarogUI.default || svarogUI;
+const { Header, Footer, Hero } = svarogUI.default || svarogUI;
 
 export default class HomePage {
   constructor() {
@@ -12,60 +12,54 @@ export default class HomePage {
 
   async render() {
     try {
-      // Fetch site configuration and recent posts
-      const [siteConfig, recentPosts] = await Promise.all([
-        this.storyblokApi.getSiteConfig(),
-        this.storyblokApi.getBlogPosts({ page: 1, perPage: 6 }),
-      ]);
+      // Fetch site configuration
+      const siteConfig = await this.storyblokApi.getSiteConfig();
+      console.log('Site config loaded:', siteConfig);
 
-      // Create page structure
-      const page = new Page({
-        className: 'home-page',
-      });
+      // Create a page container
+      this.element = document.createElement('div');
+      this.element.className = 'home-page';
 
-      // Create header
+      // Create header using svarog-ui Header component
       const header = new Header({
-        siteName: siteConfig.site_name,
-        navigation: siteConfig.primary_navigation.map((item) => ({
-          label: item.label,
-          href: item.url,
-          active: item.url === '/',
-        })),
-        logo: siteConfig.logo,
+        siteName: siteConfig.siteName,
+        navigation: {
+          items: siteConfig.navigation.items.map((item) => ({
+            label: item.label,
+            url: item.url,
+            href: item.url, // Header expects 'url' but Navigation expects 'href'
+          })),
+        },
+        logo: siteConfig.logo, // Just pass the URL string
+        className: '',
       });
 
-      // Create hero section
+      // Create hero using svarog-ui Hero component
       const hero = new Hero({
-        title: 'Welcome to ' + siteConfig.site_name,
-        subtitle: siteConfig.site_description,
-        ctaText: 'Read Our Blog',
-        ctaLink: '/blog',
+        title: `Welcome to ${siteConfig.siteName}`,
+        subtitle: siteConfig.siteDescription,
+        ctaText: 'Get Started',
+        ctaLink: '#',
         backgroundImage: '/images/hero-bg.jpg',
         align: 'center',
       });
 
-      // Create recent posts section
-      const recentPostsList = new BlogList({
-        posts: recentPosts.stories.map((story) => this.formatBlogPost(story)),
-        title: 'Recent Posts',
-        columns: 3,
-      });
-
-      // Create footer
+      // Create footer using svarog-ui Footer component
       const footer = new Footer({
-        siteName: siteConfig.site_name,
-        footer: siteConfig.footer_configuration,
+        siteName: siteConfig.siteName,
+        footer: {
+          copyright: siteConfig.footer.copyright,
+          links: siteConfig.footer.links,
+          social: siteConfig.footer.social,
+        },
+        className: '',
       });
 
-      // Assemble page
-      page.appendChildren([
-        header.getElement(),
-        hero.getElement(),
-        recentPostsList.getElement(),
-        footer.getElement(),
-      ]);
+      // Append components to page
+      this.element.appendChild(header.getElement());
+      this.element.appendChild(hero.getElement());
+      this.element.appendChild(footer.getElement());
 
-      this.element = page.getElement();
       return this.element;
     } catch (error) {
       console.error('Error rendering home page:', error);
@@ -73,27 +67,15 @@ export default class HomePage {
     }
   }
 
-  formatBlogPost(story) {
-    return {
-      title: story.content.title,
-      slug: story.slug,
-      excerpt: story.content.excerpt,
-      featuredImage: story.content.featured_image?.filename,
-      publishedDate: story.content.publication_date,
-      author: story.content.author,
-      categories: story.content.categories,
-    };
-  }
-
   renderError(error) {
-    const errorElement = document.createElement('div');
-    errorElement.className = 'error-container';
-    errorElement.innerHTML = `
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-container';
+    errorDiv.innerHTML = `
       <h1>Error Loading Page</h1>
       <p>${error.message}</p>
-      <a href="/" class="button">Return Home</a>
+      <button onclick="window.location.reload()" class="button">Retry</button>
     `;
-    return errorElement;
+    return errorDiv;
   }
 
   getElement() {

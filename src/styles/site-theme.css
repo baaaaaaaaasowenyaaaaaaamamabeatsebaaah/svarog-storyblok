@@ -88,23 +88,8 @@
   --button-primary-color: var(--color-text-inverse);
   --button-primary-hover-bg: var(--color-brand-hover);
 
-  --pagination-bg: var(--color-bg);
-  --pagination-border-color: var(--color-bg-muted);
-  --pagination-active-bg: var(--color-brand-primary);
-  --pagination-active-color: var(--color-text-inverse);
-
   --hero-overlay-opacity: 0.6;
   --hero-text-color: var(--color-text-inverse);
-
-  /* Blog specific */
-  --blog-card-aspect-ratio: 16/9;
-  --blog-card-image-height: 200px;
-  --blog-card-gap: var(--space-6);
-
-  --blog-detail-max-width: 720px;
-  --blog-detail-image-aspect-ratio: 21/9;
-  --blog-detail-content-font-size: 1.125rem;
-  --blog-detail-content-line-height: 1.7;
 }
 
 /* Add some base styling that might be missing from svarog-ui */

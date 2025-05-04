@@ -1,7 +1,5 @@
 // src/router/router.js
 import HomePage from '../pages/home.js';
-import BlogPage from '../pages/blog.js';
-import BlogDetailPage from '../pages/blogDetail.js';
 
 export class Router {
   constructor() {
@@ -31,21 +29,9 @@ export class Router {
     this.showLoading();
 
     try {
-      // Match dynamic routes
+      // Match routes
       let handler = this.routes.get(path);
       let routeParams = { ...params };
-
-      if (!handler) {
-        // Check for dynamic routes like /blog/:slug
-        for (const [routePath, routeHandler] of this.routes) {
-          const match = this.matchRoute(routePath, path);
-          if (match) {
-            handler = routeHandler;
-            routeParams = { ...params, ...match.params };
-            break;
-          }
-        }
-      }
 
       if (handler) {
         const page = new handler();
@@ -58,29 +44,6 @@ export class Router {
       console.error('Router error:', error);
       this.renderError(error);
     }
-  }
-
-  matchRoute(routePath, actualPath) {
-    // Simple dynamic route matching
-    const routeParts = routePath.split('/');
-    const actualParts = actualPath.split('/');
-
-    if (routeParts.length !== actualParts.length) {
-      return null;
-    }
-
-    const params = {};
-
-    for (let i = 0; i < routeParts.length; i++) {
-      if (routeParts[i].startsWith(':')) {
-        const paramName = routeParts[i].substring(1);
-        params[paramName] = actualParts[i];
-      } else if (routeParts[i] !== actualParts[i]) {
-        return null;
-      }
-    }
-
-    return { params };
   }
 
   renderPage(element) {
@@ -150,10 +113,8 @@ export class Router {
 export function initRouter() {
   const router = new Router();
 
-  // Define routes
+  // Define routes - only home page
   router.addRoute('/', HomePage);
-  router.addRoute('/blog', BlogPage);
-  router.addRoute('/blog/:slug', BlogDetailPage);
 
   // Initialize router
   router.init();
