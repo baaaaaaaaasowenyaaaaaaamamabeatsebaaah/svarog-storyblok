@@ -6,36 +6,31 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+// Railway provides the PORT env variable
 const PORT = process.env.PORT || 3000;
 
-console.log('Environment PORT:', process.env.PORT);
-console.log('Using PORT:', PORT);
+console.log('Server starting...');
+console.log('PORT environment variable:', process.env.PORT);
+console.log('Using port:', PORT);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'ok',
-    timestamp: new Date().toISOString(),
     port: PORT,
-    env: process.env.NODE_ENV,
+    timestamp: new Date().toISOString(),
   });
 });
 
-// Serve static files from the dist directory
+// Serve static files
 app.use(express.static(path.join(__dirname, 'dist')));
 
-// Handle client-side routing
+// Handle SPA routing
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
+// Listen on all interfaces
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server is running on http://0.0.0.0:${PORT}`);
-  console.log('NODE_ENV:', process.env.NODE_ENV);
-
-  if (process.env.NODE_ENV === 'production') {
-    console.log(`Application is ready to accept requests on port ${PORT}`);
-  } else {
-    console.log(`Open http://localhost:${PORT} to view the application`);
-  }
+  console.log(`Server running on port ${PORT}`);
 });
