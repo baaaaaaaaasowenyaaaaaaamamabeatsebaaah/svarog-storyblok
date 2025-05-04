@@ -18,11 +18,8 @@ export default class BlogPage {
 
       // Fetch site configuration and blog posts
       const [siteConfig, blogData] = await Promise.all([
-        this.storyblokApi.getSiteConfiguration(),
-        this.storyblokApi.getBlogPosts({
-          page: this.currentPage,
-          perPage: this.postsPerPage,
-        }),
+        this.storyblokApi.getSiteConfig(),
+        this.storyblokApi.getBlogPosts(this.currentPage, this.postsPerPage),
       ]);
 
       const totalPages = Math.ceil(blogData.total / this.postsPerPage);
@@ -33,19 +30,23 @@ export default class BlogPage {
       });
 
       // Create header
+      const navigation = siteConfig.navigation?.items
+        ? siteConfig.navigation.items.map((item) => ({
+            label: item.label,
+            href: item.url,
+            active: item.url === '/blog',
+          }))
+        : [];
+
       const header = new Header({
-        siteName: siteConfig.site_name,
-        navigation: siteConfig.primary_navigation.map((item) => ({
-          label: item.label,
-          href: item.url,
-          active: item.url === '/blog',
-        })),
+        siteName: siteConfig.siteName,
+        navigation: navigation,
         logo: siteConfig.logo,
       });
 
       // Create blog list
       const blogList = new BlogList({
-        posts: blogData.stories.map((story) => this.formatBlogPost(story)),
+        posts: blogData.data,
         title: 'Blog Posts',
         columns: 3,
       });
@@ -59,8 +60,8 @@ export default class BlogPage {
 
       // Create footer
       const footer = new Footer({
-        siteName: siteConfig.site_name,
-        footer: siteConfig.footer_configuration,
+        siteName: siteConfig.siteName,
+        footer: siteConfig.footer,
       });
 
       // Assemble page
@@ -90,18 +91,6 @@ export default class BlogPage {
       </div>
     `;
     return headerSection;
-  }
-
-  formatBlogPost(story) {
-    return {
-      title: story.content.title,
-      slug: story.slug,
-      excerpt: story.content.excerpt,
-      featuredImage: story.content.featured_image?.filename,
-      publishedDate: story.content.publication_date,
-      author: story.content.author,
-      categories: story.content.categories,
-    };
   }
 
   navigate(url) {

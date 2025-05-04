@@ -20,7 +20,7 @@ export default class BlogDetailPage {
 
       // Fetch site configuration and blog post
       const [siteConfig, blogPost] = await Promise.all([
-        this.storyblokApi.getSiteConfiguration(),
+        this.storyblokApi.getSiteConfig(),
         this.storyblokApi.getBlogPostBySlug(slug),
       ]);
 
@@ -29,11 +29,7 @@ export default class BlogDetailPage {
       }
 
       // Fetch related posts
-      const relatedPosts = await this.storyblokApi.getBlogPosts({
-        page: 1,
-        perPage: 3,
-        exclude: blogPost.uuid,
-      });
+      const relatedPosts = await this.storyblokApi.getBlogPosts(1, 3);
 
       // Create page structure
       const page = new Page({
@@ -41,33 +37,30 @@ export default class BlogDetailPage {
       });
 
       // Create header
+      const navigation = siteConfig.navigation?.items
+        ? siteConfig.navigation.items.map((item) => ({
+            label: item.label,
+            href: item.url,
+            active: false,
+          }))
+        : [];
+
       const header = new Header({
-        siteName: siteConfig.site_name,
-        navigation: siteConfig.primary_navigation.map((item) => ({
-          label: item.label,
-          href: item.url,
-          active: false,
-        })),
+        siteName: siteConfig.siteName,
+        navigation: navigation,
         logo: siteConfig.logo,
       });
 
       // Create blog detail
-      const blogDetail = new BlogDetail({
-        title: blogPost.content.title,
-        content: blogPost.content.content,
-        featuredImage: blogPost.content.featured_image?.filename,
-        publishedDate: blogPost.content.publication_date,
-        author: blogPost.content.author,
-        categories: blogPost.content.categories,
-      });
+      const blogDetail = new BlogDetail(blogPost);
 
       // Create related posts section
-      const relatedPostsSection = this.createRelatedPostsSection(relatedPosts.stories);
+      const relatedPostsSection = this.createRelatedPostsSection(relatedPosts.data);
 
       // Create footer
       const footer = new Footer({
-        siteName: siteConfig.site_name,
-        footer: siteConfig.footer_configuration,
+        siteName: siteConfig.siteName,
+        footer: siteConfig.footer,
       });
 
       // Assemble page
@@ -87,31 +80,19 @@ export default class BlogDetailPage {
   }
 
   createRelatedPostsSection(relatedPosts) {
-    if (!relatedPosts.length) return null;
+    if (!relatedPosts || !relatedPosts.length) return null;
 
     const section = document.createElement('section');
     section.className = 'related-posts';
 
     const blogList = new BlogList({
-      posts: relatedPosts.map((story) => this.formatBlogPost(story)),
+      posts: relatedPosts,
       title: 'Related Posts',
       columns: 3,
     });
 
     section.appendChild(blogList.getElement());
     return section;
-  }
-
-  formatBlogPost(story) {
-    return {
-      title: story.content.title,
-      slug: story.slug,
-      excerpt: story.content.excerpt,
-      featuredImage: story.content.featured_image?.filename,
-      publishedDate: story.content.publication_date,
-      author: story.content.author,
-      categories: story.content.categories,
-    };
   }
 
   renderError(error) {
