@@ -1,0 +1,165 @@
+/* src/styles/site-theme.css */
+
+.site-theme {
+  /* Override Svarog default theme variables */
+
+  /* Typography */
+  --font-family-primary:
+    system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
+  --font-family-heading: var(--font-family-primary);
+  --font-family-monospace:
+    ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
+
+  /* Brand Colors */
+  --color-brand-primary: #0066cc;
+  --color-brand-secondary: #00cc66;
+  --color-brand-tertiary: #cc0066;
+  --color-brand-hover: #0052a3;
+
+  /* Background Colors */
+  --color-bg: #ffffff;
+  --color-bg-subtle: #f8f9fa;
+  --color-bg-muted: #e9ecef;
+
+  /* Text Colors */
+  --color-text: #212529;
+  --color-text-subtle: #6c757d;
+  --color-text-muted: #adb5bd;
+  --color-text-inverse: #ffffff;
+
+  /* State Colors */
+  --color-success: #28a745;
+  --color-info: #17a2b8;
+  --color-warning: #ffc107;
+  --color-error: #dc3545;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+
+  /* Border Radius */
+  --border-radius-small: 0.25rem;
+  --border-radius-medium: 0.5rem;
+  --border-radius-large: 1rem;
+  --border-radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-small: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-large: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  /* Layout */
+  --container-max-width: 1200px;
+  --content-max-width: 800px;
+
+  /* Transitions */
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 300ms ease-in-out;
+  --transition-slow: 500ms ease-in-out;
+
+  /* Line Heights */
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-loose: 2;
+
+  /* Component-specific overrides */
+  --header-bg: var(--color-bg);
+  --header-border-color: var(--color-bg-muted);
+  --header-height: 80px;
+
+  --footer-bg: var(--color-bg-subtle);
+  --footer-border-color: var(--color-bg-muted);
+
+  --card-bg: var(--color-bg);
+  --card-border-color: var(--color-bg-muted);
+  --card-shadow: var(--shadow-small);
+  --card-hover-shadow: var(--shadow-medium);
+
+  --button-primary-bg: var(--color-brand-primary);
+  --button-primary-color: var(--color-text-inverse);
+  --button-primary-hover-bg: var(--color-brand-hover);
+
+  --pagination-bg: var(--color-bg);
+  --pagination-border-color: var(--color-bg-muted);
+  --pagination-active-bg: var(--color-brand-primary);
+  --pagination-active-color: var(--color-text-inverse);
+
+  --hero-overlay-opacity: 0.6;
+  --hero-text-color: var(--color-text-inverse);
+
+  /* Blog specific */
+  --blog-card-aspect-ratio: 16/9;
+  --blog-card-image-height: 200px;
+  --blog-card-gap: var(--space-6);
+
+  --blog-detail-max-width: 720px;
+  --blog-detail-image-aspect-ratio: 21/9;
+  --blog-detail-content-font-size: 1.125rem;
+  --blog-detail-content-line-height: 1.7;
+}
+
+/* Add some base styling that might be missing from svarog-ui */
+body.site-theme {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family-primary);
+  line-height: var(--line-height-normal);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .site-theme {
+    --color-bg: #121212;
+    --color-bg-subtle: #1e1e1e;
+    --color-bg-muted: #2d2d2d;
+
+    --color-text: #e0e0e0;
+    --color-text-subtle: #a0a0a0;
+    --color-text-muted: #6c6c6c;
+
+    --color-brand-primary: #3399ff;
+    --color-brand-hover: #66b3ff;
+
+    --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --card-hover-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+
+    --header-border-color: var(--color-bg-muted);
+    --footer-bg: var(--color-bg-subtle);
+  }
+}
+
+/* Responsive typography */
+@media (min-width: 768px) {
+  .site-theme {
+    --font-size-body: 1rem;
+    --font-size-small: 0.875rem;
+    --font-size-large: 1.125rem;
+
+    --heading-1-size: 2.5rem;
+    --heading-2-size: 2rem;
+    --heading-3-size: 1.75rem;
+    --heading-4-size: 1.5rem;
+    --heading-5-size: 1.25rem;
+    --heading-6-size: 1.125rem;
+  }
+}
+
+/* Print styles */
+@media print {
+  .site-theme {
+    --color-brand-primary: #000000;
+    --color-text: #000000;
+    --color-bg: #ffffff;
+  }
+}
